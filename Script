@@ -157,7 +157,7 @@ task.spawn(function()
             if ore then
                 busy = true
                 moveToOre(ore)
-            elseif autoSearch then
+            elseif autoSearch == true then
                 root.CFrame += Vector3.new(moveSpeed * loopSpeed,0,0) * 2.7
             end
         end
