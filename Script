@@ -17,6 +17,7 @@ local ignoreFilterMinRar = getgenv().ignoreFilterMinRar or 1000000
 local mineRange = getgenv().mineRange or 12
 local mineSpeed = getgenv().mineSpeed or 0.1
 local moveSpeed = getgenv().moveSpeed or 65
+local autoSearch = getgenv().autoSearch or true
 local esp = getgenv().esp ~= false
 
 local loopSpeed = getgenv().loopSpeed or 0.02
@@ -156,7 +157,7 @@ task.spawn(function()
             if ore then
                 busy = true
                 moveToOre(ore)
-            else
+            elseif autoSearch then
                 root.CFrame += Vector3.new(moveSpeed * loopSpeed,0,0) * 2.7
             end
         end
