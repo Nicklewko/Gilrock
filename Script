@@ -142,7 +142,7 @@ local function moveToOre(ore)
         end
 
         local step = math.min(moveSpeed * dt, distance - mineRange)
-        root.CFrame += direction.Unit * step
+        root.CFrame += direction.Unit * step * 1.15
     end)
 end
 
@@ -157,7 +157,7 @@ task.spawn(function()
             if ore then
                 busy = true
                 moveToOre(ore)
-            elseif autoSearch == true then
+            elseif autoSearch then
                 root.CFrame += Vector3.new(moveSpeed * loopSpeed,0,0) * 2.7
             end
         end
