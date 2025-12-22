@@ -1,0 +1,152 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local root = char:WaitForChild("HumanoidRootPart")
+
+local mineRemote = ReplicatedStorage:WaitForChild("MineBlock")
+local rarityData = require(ReplicatedStorage:WaitForChild("BlockTypes")).OreTypes
+
+local on = true
+local movingConnection
+local busy = false
+
+----------------------------------------------------
+-- UI
+----------------------------------------------------
+
+local gui = Instance.new("ScreenGui")
+gui.Parent = gethui()
+
+local onB = Instance.new("TextButton")
+onB.Parent = gui
+onB.Size = UDim2.new(0.1,0,0.1,0)
+onB.BackgroundColor3 = Color3.new(0.5,1,0.5)
+onB.Text = "On"
+onB.TextScaled = true
+
+onB.MouseButton1Click:Connect(function()
+    on = not on
+    if on then
+        onB.BackgroundColor3 = Color3.new(0.5,1,0.5)
+        onB.Text = "On"
+    else
+        onB.BackgroundColor3 = Color3.new(1,0.5,0.5)
+        onB.Text = "Off"
+    end
+end)
+
+----------------------------------------------------
+-- Ore-Auswahl
+----------------------------------------------------
+
+local function getBestOre()
+    local bestOre = nil
+    local bestRarity = -math.huge
+    local bestDist = math.huge
+
+    for _, chunk in pairs(workspace.Chunks:GetChildren()) do
+        for _, ore in pairs(chunk:GetChildren()) do
+            if not ore:IsA("BasePart") then
+                continue
+            end
+
+            if ore.Position.Z <= -1 then continue end
+
+            local rData = rarityData[ore.Name]
+            local rarity = rData and rData.Rarity or 0
+
+            if name and ore.Name ~= name and rarity <= ignoreFilterMinRar then
+                continue
+            end
+
+            if minRar and rarity < minRar then
+                continue
+            end
+
+            local dist = (ore.Position - root.Position).Magnitude
+
+            if name then
+                if dist < bestDist then
+                    bestDist = dist
+                    bestOre = ore
+                end
+            else
+                if rarity > bestRarity or (rarity == bestRarity and dist < bestDist) then
+                    bestRarity = rarity
+                    bestDist = dist
+                    bestOre = ore
+                end
+            end
+
+            if esp and not ore:FindFirstChildOfClass("Highlight") then
+                local hl = Instance.new("Highlight")
+                hl.Parent = ore
+            end
+        end
+    end
+
+    return bestOre
+end
+
+----------------------------------------------------
+-- Movement + Mining
+----------------------------------------------------
+
+local function moveToOre(ore)
+    if movingConnection then
+        movingConnection:Disconnect()
+        movingConnection = nil
+    end
+
+    movingConnection = RunService.Heartbeat:Connect(function(dt)
+        if not ore or not ore.Parent then
+            movingConnection:Disconnect()
+            movingConnection = nil
+            busy = false
+            return
+        end
+
+        local direction = ore.Position - root.Position
+        local distance = direction.Magnitude
+
+        if distance <= mineRange + 1 then
+            movingConnection:Disconnect()
+            movingConnection = nil
+
+            task.spawn(function()
+                while ore.Parent do
+                    mineRemote:FireServer(ore)
+                    task.wait(mineSpeed)
+                end
+                busy = false
+            end)
+
+            return
+        end
+
+        local step = math.min(moveSpeed * dt, distance - mineRange)
+        root.CFrame += direction.Unit * step
+    end)
+end
+
+----------------------------------------------------
+-- Main Loop
+----------------------------------------------------
+
+task.spawn(function()
+    while true do
+        if not busy and on then
+            local ore = getBestOre()
+            if ore then
+                busy = true
+                moveToOre(ore)
+            else
+                root.CFrame += Vector3.new(moveSpeed * loopSpeed,0,0) * 2.7
+            end
+        end
+        task.wait(loopSpeed)
+    end
+end)
