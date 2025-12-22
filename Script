@@ -5,6 +5,8 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local root = char:WaitForChild("HumanoidRootPart")
+local cam = workspace.CurrentCamera
+cam.FOV = 120
 
 local mineRemote = ReplicatedStorage:WaitForChild("MineBlock")
 local rarityData = require(ReplicatedStorage:WaitForChild("BlockTypes")).OreTypes
