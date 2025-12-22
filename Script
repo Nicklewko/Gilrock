@@ -9,6 +9,19 @@ local root = char:WaitForChild("HumanoidRootPart")
 local mineRemote = ReplicatedStorage:WaitForChild("MineBlock")
 local rarityData = require(ReplicatedStorage:WaitForChild("BlockTypes")).OreTypes
 
+--// Settings aus Loader //
+local name = getgenv().name
+local minRar = getgenv().minRar or 2000
+local ignoreFilterMinRar = getgenv().ignoreFilterMinRar or 1000000
+
+local mineRange = getgenv().mineRange or 12
+local mineSpeed = getgenv().mineSpeed or 0.1
+local moveSpeed = getgenv().moveSpeed or 65
+local esp = getgenv().esp ~= false
+
+local loopSpeed = getgenv().loopSpeed or 0.02
+-------------------------
+
 local on = true
 local movingConnection
 local busy = false
