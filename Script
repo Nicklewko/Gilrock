@@ -72,7 +72,7 @@ local function getBestOre()
             local rData = rarityData[ore.Name]
             local rarity = rData and rData.Rarity or 0
 
-            if name and ore.Name ~= name and rarity <= ignoreFilterMinRar then
+            if name and ore.Name ~= name and rarity < ignoreFilterMinRar then
                 continue
             end
 
@@ -83,7 +83,11 @@ local function getBestOre()
             local dist = (ore.Position - root.Position).Magnitude
 
             if name then
-                if dist < bestDist then
+                if rarity >= ignoreFilterMinRar and rarity > bestRarity then
+                    bestRarity = rarity
+                    bestDist = 0
+                    bestOre = ore
+                elseif dist < bestDist then
                     bestDist = dist
                     bestOre = ore
                 end
