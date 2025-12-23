@@ -46,6 +46,13 @@ onB.MouseButton1Click:Connect(function()
     end
 end)
 
+local function highlight(ore)
+    if esp and not ore:FindFirstChildOfClass("Highlight") then
+        local hl = Instance.new("Highlight")
+        hl.Parent = ore
+    end
+end
+
 local function getBestOre()
     local bestOre = nil
     local bestRarity = -math.huge
@@ -89,10 +96,7 @@ local function getBestOre()
                 end
             end
 
-            if esp and not ore:FindFirstChildOfClass("Highlight") then
-                local hl = Instance.new("Highlight")
-                hl.Parent = ore
-            end
+            highlight(ore)
         end
     end
 
@@ -105,7 +109,7 @@ local function moveToOre(ore)
         movingConnection = nil
     end
 
-    movingConnection = RunService.RenderStepped:Connect(function(dt)
+    movingConnection = RunService.Heartbeat:Connect(function(dt)
         if not ore or not ore.Parent then
             movingConnection:Disconnect()
             movingConnection = nil
@@ -116,7 +120,7 @@ local function moveToOre(ore)
         local direction = ore.Position - root.Position
         local distance = direction.Magnitude
 
-        if distance <= mineRange + 1 then
+        if distance <= mineRange + 0.5 then
             movingConnection:Disconnect()
             movingConnection = nil
 
@@ -125,8 +129,8 @@ local function moveToOre(ore)
                     mineRemote:FireServer(ore)
                     task.wait(mineSpeed)
                 end
+                busy = false
             end)
-            busy = false
 
             return
         end
