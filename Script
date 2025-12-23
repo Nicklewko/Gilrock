@@ -129,8 +129,8 @@ local function moveToOre(ore)
                     mineRemote:FireServer(ore)
                     task.wait(mineSpeed)
                 end
+                busy = false
             end)
-            busy = false
 
             return
         end
