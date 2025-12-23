@@ -123,7 +123,6 @@ local function moveToOre(ore)
         if distance <= mineRange + 0.5 then
             movingConnection:Disconnect()
             movingConnection = nil
-            busy = true
 
             task.spawn(function()
                 while ore.Parent do
@@ -146,6 +145,7 @@ task.spawn(function()
         if not busy and on then
             local ore = getBestOre()
             if ore then
+                busy = true
                 moveToOre(ore)
             elseif autoSearch then
                 root.CFrame += Vector3.new(moveSpeed * loopSpeed,0,0) * 2.7
