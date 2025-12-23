@@ -9,7 +9,6 @@ local root = char:WaitForChild("HumanoidRootPart")
 local mineRemote = ReplicatedStorage:WaitForChild("MineBlock")
 local rarityData = require(ReplicatedStorage:WaitForChild("BlockTypes")).OreTypes
 
---// Settings aus Loader //
 local name = getgenv().name
 local minRar = getgenv().minRar or 2000
 local ignoreFilterMinRar = getgenv().ignoreFilterMinRar or 1000000
@@ -21,15 +20,10 @@ local autoSearch = getgenv().autoSearch or true
 local esp = getgenv().esp ~= false
 
 local loopSpeed = getgenv().loopSpeed or 0.02
--------------------------
 
 local on = true
 local movingConnection
 local busy = false
-
-----------------------------------------------------
--- UI
-----------------------------------------------------
 
 local gui = Instance.new("ScreenGui")
 gui.Parent = gethui()
@@ -51,10 +45,6 @@ onB.MouseButton1Click:Connect(function()
         onB.Text = "Off"
     end
 end)
-
-----------------------------------------------------
--- Ore-Auswahl
-----------------------------------------------------
 
 local function getBestOre()
     local bestOre = nil
@@ -109,17 +99,13 @@ local function getBestOre()
     return bestOre
 end
 
-----------------------------------------------------
--- Movement + Mining
-----------------------------------------------------
-
 local function moveToOre(ore)
     if movingConnection then
         movingConnection:Disconnect()
         movingConnection = nil
     end
 
-    movingConnection = RunService.Heartbeat:Connect(function(dt)
+    movingConnection = RunService.RenderStepped:Connect(function(dt)
         if not ore or not ore.Parent then
             movingConnection:Disconnect()
             movingConnection = nil
@@ -139,8 +125,8 @@ local function moveToOre(ore)
                     mineRemote:FireServer(ore)
                     task.wait(mineSpeed)
                 end
-                busy = false
             end)
+            busy = false
 
             return
         end
@@ -149,10 +135,6 @@ local function moveToOre(ore)
         root.CFrame += direction.Unit * step * 1.15
     end)
 end
-
-----------------------------------------------------
--- Main Loop
-----------------------------------------------------
 
 task.spawn(function()
     while true do
