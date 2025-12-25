@@ -148,7 +148,7 @@ task.spawn(function()
                 busy = true
                 moveToOre(ore)
             elseif autoSearch then
-                root.CFrame += Vector3.new(moveSpeed * loopSpeed,0,0) * 2.7
+                root.CFrame += Vector3.new(moveSpeed * loopSpeed * 2.7,moveSpeed * loopSpeed/2,0)
             end
         end
         task.wait(loopSpeed)
